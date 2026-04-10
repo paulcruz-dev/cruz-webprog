@@ -1,19 +1,34 @@
-import React from 'react';
-import './App.css';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+
+// Layout & Pages
+import Layout from './components/Layout';
+import HomePage from './pages/HomePage';
+import AboutPage from './pages/AboutPage';
+import ArticlePage from './pages/ArticlePage';
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Layout />,
+    children: [
+      {
+        index: true, // cleaner than path: ''
+        element: <HomePage />,
+      },
+      {
+        path: 'about', // remove leading slash
+        element: <AboutPage />,
+      },
+      {
+        path: 'articles',
+        element: <ArticlePage />,
+      },
+    ],
+  },
+]);
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Welcome to my React App!</h1>
-        <p>
-          Name: John Paul Cruz<br />
-          Email: johnpaulcruz859@gmail.com<br />
-          Other Personal Info: <a href="http://github.com/paulcruz-dev/cruz-webprog">GitHub Link</a>
-        </p>
-      </header>
-    </div>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

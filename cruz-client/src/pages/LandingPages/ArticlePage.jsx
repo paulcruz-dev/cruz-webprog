@@ -1,8 +1,8 @@
-import Button from '../components/Button';
-import currents from '../assets/currents.png';
-import blurryface from '../assets/blurryface.png';
-import fml from '../assets/fml.png';
-import idiot from '../assets/idiot.png';
+import Button from '../../components/Button';
+import currents from '../../assets/currents.png';
+import blurryface from '../../assets/blurryface.png';
+import fml from '../../assets/fml.png';
+import idiot from '../../assets/idiot.png';
  
 const ArticlePage = () => {
     return (

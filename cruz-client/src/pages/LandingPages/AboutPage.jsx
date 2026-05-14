@@ -1,9 +1,9 @@
-import Button from '../components/Button';
-import rock from '../assets/rock.png';
-import green from '../assets/green.jpg';
-import top from '../assets/top.jpg';
-import impala from '../assets/impala.jpg';
-import seventeen from '../assets/seventeen.jpg';
+import Button from '../../components/Button';
+import rock from '../../assets/rock.png';
+import green from '../../assets/green.jpg';
+import top from '../../assets/top.jpg';
+import impala from '../../assets/impala.jpg';
+import seventeen from '../../assets/seventeen.jpg';
  
 const AboutPage = () => {
     return (

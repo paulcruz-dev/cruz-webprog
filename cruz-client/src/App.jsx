@@ -1,34 +1,91 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
-// Layout & Pages
-import Layout from './components/Layout';
-import HomePage from './pages/HomePage';
-import AboutPage from './pages/AboutPage';
-import ArticlePage from './pages/ArticlePage';
+import Layout from './layout/Layout';
+import ArticlePage from './pages/LandingPages/ArticlePage';
+import HomePage from './pages/LandingPages/HomePage';
+import AboutPage from './pages/LandingPages/AboutPage';
+import ArticleListPage from './pages/LandingPages/ArticleListPage';
 
-const router = createBrowserRouter([
+import AuthLayout from './layout/AuthLayout';
+import SignInPage from './pages/AuthPages/SignInPage';
+import SignUpPage from './pages/AuthPages/SignUpPage';
+
+import NotFoundPage from './pages/NotFoundPage';
+
+import DashLayout from './layout/DashLayout';
+import DashboardPage from './pages/DashboardPages/DashboardPage';
+import ReportsPage from './pages/DashboardPages/ReportsPage';
+import UsersPage from './pages/DashboardPages/UsersPage';
+
+const routes = [
   {
     path: '/',
     element: <Layout />,
+    errorElement: <NotFoundPage />,
     children: [
       {
-        index: true, // cleaner than path: ''
+        path: '',
         element: <HomePage />,
       },
       {
-        path: 'about', // remove leading slash
+        path: 'about',
         element: <AboutPage />,
       },
       {
         path: 'articles',
+        element: <ArticleListPage />,
+      },
+      {
+        path: 'articles/:name',
         element: <ArticlePage />,
       },
     ],
   },
-]);
+  {
+    path: "auth/",
+    element: <AuthLayout />,
+    errorElement: <NotFoundPage />,
+    children: [
+      {
+        path: "signin",
+        element: <SignInPage />,
+      },
+      {
+        path: "signup",
+        element: <SignUpPage />,
+      },
+    ],
+  },
+  // ✅ ADDED DASHBOARD ROUTES
+  {
+    path: "dashboard/",
+    element: <DashLayout />,
+    errorElement: <NotFoundPage />,
+    children: [
+      {
+        path: "",
+        element: <DashboardPage />,
+      },
+      {
+        path: "reports",
+        element: <ReportsPage />,
+      },
+      {
+        path: "users",
+        element: <UsersPage />,
+      },
+    ],
+  },
+];
+
+const router = createBrowserRouter(routes);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+    </>
+  );
 }
 
 export default App;

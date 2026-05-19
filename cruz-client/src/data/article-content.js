@@ -1,8 +1,8 @@
-import mood from './mood.jpg';
-import blue from './blue.jpg';
-import tune from './tune.jpg';
-import chill from './chill.jpg';
-import song from './song.jpg';
+import mood from "../assets/mood.jpg";
+import blue from "../assets/blue.jpg";
+import tune from "../assets/tune.jpg";
+import chill from "../assets/chill.jpg";
+import song from "../assets/song.jpg";
 
 const articles = [
   {

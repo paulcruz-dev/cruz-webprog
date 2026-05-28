@@ -6,6 +6,7 @@
     "@mui/material": "^7.3.11",
     "@mui/x-charts": "^9.2.0",
     "@mui/x-data-grid": "^8.28.6",
+    "axios": "^1.16.1",
     "leaflet": "^1.9.4",
     "react-leaflet": "^5.0.0"
   }

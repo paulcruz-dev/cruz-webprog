@@ -2,7 +2,7 @@ import axios from "axios";
 import constants from "../constants";
 
 const API = axios.create({
-  baseURL: `${constants.HOST}/users`,
+  baseURL: `${constants.HOST}/api/users`, // ← added /api here
 });
 
 API.interceptors.request.use((req) => {
@@ -22,13 +22,10 @@ export const fetchUsers = () => API.get("/");
 export const createUser = (user) => API.post("/", user);
 
 // Update user
-export const updateUser = (id, user) =>
-  API.put(`/${id}`, user);
+export const updateUser = (id, user) => API.put(`/${id}`, user);
 
 // Delete user
-export const deleteUser = (id) =>
-  API.delete(`/${id}`);
+export const deleteUser = (id) => API.delete(`/${id}`);
 
 // Login user
-export const loginUser = (credentials) =>
-  API.post("/login", credentials);
+export const loginUser = (credentials) => API.post("/login", credentials);

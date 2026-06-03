@@ -22,6 +22,11 @@ const SignInPage = () => {
     try {
       const { data } = await loginUser({ email, password });
 
+      if (data.type === 'viewer') {
+        setError('Viewers are not allowed to log in.');
+        return;
+      }
+
       localStorage.setItem('token', data.token);
       localStorage.setItem('firstName', data.firstName);
       localStorage.setItem('type', data.type);
@@ -73,7 +78,6 @@ const SignInPage = () => {
             <input type="checkbox" className="accent-indigo-500" />
             Remember me
           </label>
-
           <button type="button" className="text-indigo-400 hover:text-indigo-300">
             Forgot?
           </button>

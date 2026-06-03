@@ -5,7 +5,7 @@ const ArticleList = ({ articles }) => {
     <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {articles.map((article, index) => (
         <div
-          key={article.name}
+          key={article._id}
           className="group flex flex-col justify-between rounded-2xl border border-white/10 bg-zinc-900 p-4 transition duration-300 hover:-translate-y-1 hover:border-white/30 hover:shadow-xl"
         >
           {/* IMAGE */}
@@ -29,12 +29,12 @@ const ArticleList = ({ articles }) => {
 
           {/* DESCRIPTION */}
           <p className="mt-2 text-sm leading-6 text-white/60 line-clamp-3">
-            {article.content[0]}
+            {article.content}
           </p>
 
           {/* BUTTON */}
           <Link
-            to={`/articles/${article.name}`}
+            to={`/articles/${article._id}`}
             className="mt-4 inline-block w-fit rounded-full border border-white/30 px-4 py-2 text-xs uppercase tracking-wider text-white transition hover:bg-white hover:text-black"
           >
             Read More

@@ -1,121 +1,97 @@
-import Button from '../../components/Button.jsx';
-import ArticleList from '../../components/ArticleList.jsx';
-import articles from '../../data/article-content.js';
-import music from '../../assets/music.jpg';
+import { useEffect, useState } from "react";
+import { fetchPublishedArticles } from "../../services/ArticleService";
+import { Link } from "react-router-dom";
 
 const ArticleListPage = () => {
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadArticles = async () => {
+      try {
+        const { data } = await fetchPublishedArticles();
+        setArticles(data.articles);
+      } catch (error) {
+        console.error("Error fetching articles:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadArticles();
+  }, []);
+
+  if (loading)
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-950">
+        <p className="text-sm text-zinc-400 uppercase tracking-widest">Loading articles...</p>
+      </div>
+    );
+
+  if (articles.length === 0)
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-950">
+        <p className="text-sm text-zinc-500 uppercase tracking-widest">No articles available.</p>
+      </div>
+    );
+
   return (
-    <div className="flex min-h-screen flex-col bg-black text-white">
+    <div className="min-h-screen bg-zinc-950 px-4 py-24 lg:px-8">
+      <div className="mx-auto max-w-6xl">
 
-      <section className="border-b border-white/20 px-6 py-10 lg:px-12">
-        <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
-
-          <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/50">
-              Music Journal
-            </p>
-
-            <h1 className="max-w-xl text-4xl font-bold leading-tight sm:te
-            xt-5xl">
-              Stories Behind the Sound
-            </h1>
-
-            <p className="mt-4  max-w-lg text-sm leading-7 text-white/70 sm:text-base">
-              Explore rhythm, blues, and everything in between. From artist
-              spotlights to genre deep-dives, discover the music that shapes
-              culture and emotion.
-            </p>
-
-            <div className="mt-6">
-              <Button
-                to="/"
-                className="border border-white text-white hover:bg-white hover:text-black transition"
-              >
-                Back Home
-              </Button>
-            </div>
-          </div>
-
-          <div className="w-full h-64 sm:h-80 lg:h-full border border-white/20 rounded-2xl overflow-hidden">
-            <img
-              src={music}
-              alt="music"
-              className="w-full h-full object-cover hover:scale-105 transition duration-300"
-            />
-          </div>
-
-        </div>
-      </section>
-
-      <section className="flex-1 px-6 py-10 lg:px-12">
-        <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/50">
-            Latest Drops
+        {/* HEADER */}
+        <div className="mb-10 border-b border-zinc-800 pb-6">
+          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
+            Latest Posts
           </p>
-
-          <h2 className="mt-2 text-2xl font-semibold">
-            Music Articles
-          </h2>
-
-          <div className="mt-2 h-[1px] w-16 bg-white/30"></div>
+          <h1 className="mt-2 text-3xl font-semibold text-white">
+            Articles
+          </h1>
         </div>
 
-        <ArticleList articles={articles} />
-      </section>
+        {/* GRID */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {articles.map((article) => (
+            <article
+              key={article._id}
+              className="group flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 transition duration-300 hover:-translate-y-1 hover:border-zinc-600 hover:shadow-xl"
+            >
+              {/* IMAGE */}
+              {article.image && (
+                <div className="h-44 w-full overflow-hidden">
+                  <img
+                    src={article.image}
+                    alt={article.title}
+                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                  />
+                </div>
+              )}
 
-      <footer className="border-t border-white/20 px-6 py-10 lg:px-12">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-
-          <div>
-            <h3 className="text-lg font-semibold">Music Journal</h3>
-            <p className="mt-3 text-sm text-white/60 leading-6">
-              A space dedicated to rhythm, blues, and the stories behind every sound.
-            </p>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-white/70">
-              Explore
-            </h4>
-            <ul className="mt-3 space-y-2 text-sm text-white/60">
-              <li><a href="/" className="hover:text-white transition">Home</a></li>
-              <li><a href="/articles" className="hover:text-white transition">Articles</a></li>
-              <li><a href="#" className="hover:text-white transition">Genres</a></li>
-              <li><a href="#" className="hover:text-white transition">Artists</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-white/70">
-              Genres
-            </h4>
-            <ul className="mt-3 space-y-2 text-sm text-white/60">
-              <li>Hip-Hop</li>
-              <li>R&B</li>
-              <li>Indie</li>
-              <li>Jazz</li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-white/70">
-              Connect
-            </h4>
-            <ul className="mt-3 space-y-2 text-sm text-white/60">
-              <li><a href="#" className="hover:text-white transition">Instagram</a></li>
-              <li><a href="#" className="hover:text-white transition">Twitter</a></li>
-              <li><a href="#" className="hover:text-white transition">YouTube</a></li>
-              <li><a href="#" className="hover:text-white transition">Email</a></li>
-            </ul>
-          </div>
-
+              {/* BODY */}
+              <div className="flex flex-1 flex-col p-5">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-400">
+                  {article.category}
+                </p>
+                <h2 className="mt-2 text-base font-semibold leading-snug text-white">
+                  {article.title}
+                </h2>
+                <p className="mt-2 flex-1 text-sm leading-6 text-zinc-400 line-clamp-3">
+                  {article.content}
+                </p>
+                <div className="mt-4 flex items-center justify-between">
+                  <p className="text-xs text-zinc-500">By {article.author}</p>
+                  <Link
+                    to={`/articles/${article._id}`}
+                    className="rounded-full border border-zinc-600 px-4 py-1.5 text-xs uppercase tracking-wider text-zinc-300 transition hover:bg-white hover:text-black"
+                  >
+                    Read More
+                  </Link>
+                </div>
+              </div>
+            </article>
+          ))}
         </div>
 
-        <div className="mt-10 border-t border-white/10 pt-6 text-center text-xs text-white/40">
-          © {new Date().getFullYear()} Music Journal. All rights reserved.
-        </div>
-      </footer>
-
+      </div>
     </div>
   );
 };

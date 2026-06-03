@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -6,19 +6,24 @@ import {
   Stack,
   Modal,
   TextField,
+  FormControl,
+  InputLabel,
+  Select,
   MenuItem,
-  Chip,
+  Switch,
+  FormControlLabel,
+  Divider,
 } from "@mui/material";
-
 import { DataGrid } from "@mui/x-data-grid";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { fetchArticles, createArticle, updateArticle, deleteArticle } from "../../services/ArticleService";
 
 const modalStyle = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 700,
+  width: 500,
   bgcolor: "background.paper",
   borderRadius: 2,
   boxShadow: 24,
@@ -27,159 +32,146 @@ const modalStyle = {
 
 const DashArticleListPage = () => {
   const [open, setOpen] = useState(false);
-
-  const [articles, setArticles] = useState([
-    {
-      id: "A770DD",
-      slug: "test",
-      title: "test",
-      paragraphs: 3,
-      preview: "Sample preview article content...",
-      status: "Active",
-    },
-  ]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editArticleId, setEditArticleId] = useState(null);
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [newArticle, setNewArticle] = useState({
-    slug: "",
     title: "",
-    paragraphs: "",
-    preview: "",
-    status: "Active",
+    content: "",
+    author: "",
+    category: "",
+    image: "",
+    isPublished: true,
   });
 
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] =
-    useState("All");
-
-  const handleOpen = () => setOpen(true);
-
-  const handleClose = () => setOpen(false);
-
-  const handleAddArticle = () => {
-    const article = {
-      id: Math.random().toString(36).substring(2, 8),
-      ...newArticle,
-    };
-
-    setArticles([...articles, article]);
-
-    setNewArticle({
-      slug: "",
-      title: "",
-      paragraphs: "",
-      preview: "",
-      status: "Active",
-    });
-
-    handleClose();
+  const loadArticles = async () => {
+    try {
+      setLoading(true);
+      const { data } = await fetchArticles();
+      setArticles(data.articles);
+    } catch (error) {
+      console.error("Error fetching articles:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filteredArticles = articles.filter(
-    (article) => {
-      const matchesSearch =
-        article.title
-          .toLowerCase()
-          .includes(search.toLowerCase()) ||
-        article.slug
-          .toLowerCase()
-          .includes(search.toLowerCase());
+  useEffect(() => {
+    loadArticles();
+  }, []);
 
-      const matchesStatus =
-        statusFilter === "All" ||
-        article.status === statusFilter;
+  const handleOpen = () => {
+    setIsEditing(false);
+    setNewArticle({
+      title: "",
+      content: "",
+      author: "",
+      category: "",
+      image: "",
+      isPublished: true,
+    });
+    setOpen(true);
+  };
 
-      return matchesSearch && matchesStatus;
+  const handleClose = () => {
+    setOpen(false);
+    setIsEditing(false);
+    setEditArticleId(null);
+  };
+
+  const handleEdit = (id) => {
+    const articleToEdit = articles.find((a) => a._id === id);
+    if (articleToEdit) {
+      setNewArticle({ ...articleToEdit });
+      setEditArticleId(id);
+      setIsEditing(true);
+      setOpen(true);
     }
-  );
+  };
+
+  const handleSaveArticle = async () => {
+    try {
+      if (isEditing) {
+        await updateArticle(editArticleId, newArticle);
+      } else {
+        await createArticle(newArticle);
+      }
+      loadArticles();
+      handleClose();
+    } catch (error) {
+      console.error("Error saving article:", error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this article?")) {
+      try {
+        await deleteArticle(id);
+        loadArticles();
+      } catch (error) {
+        console.error("Error deleting article:", error);
+      }
+    }
+  };
+
+  const handleTogglePublish = async (id, isPublished) => {
+    try {
+      await updateArticle(id, { isPublished: !isPublished });
+      loadArticles();
+    } catch (error) {
+      console.error("Error toggling article:", error);
+    }
+  };
 
   const columns = [
+    { field: "title", headerName: "Title", flex: 1 },
+    { field: "author", headerName: "Author", flex: 1 },
+    { field: "category", headerName: "Category", flex: 1 },
     {
-      field: "id",
-      headerName: "ID",
-      width: 120,
-    },
-
-    {
-      field: "slug",
-      headerName: "Slug",
+      field: "isPublished",
+      headerName: "Published",
       flex: 1,
-    },
-
-    {
-      field: "title",
-      headerName: "Title",
-      flex: 1,
-    },
-
-    {
-      field: "paragraphs",
-      headerName: "Paragraphs",
-      width: 130,
-    },
-
-    {
-      field: "preview",
-      headerName: "Preview",
-      flex: 2,
-    },
-
-    {
-      field: "status",
-      headerName: "Status",
-      width: 130,
       renderCell: (params) => (
-        <Chip
-          label={params.value}
-          color={
-            params.value === "Active"
-              ? "success"
-              : "error"
-          }
-          size="small"
+        <Switch
+          checked={params.row.isPublished}
+          onChange={() => handleTogglePublish(params.row._id, params.row.isPublished)}
         />
       ),
     },
-
     {
       field: "actions",
       headerName: "Actions",
-      width: 180,
-      renderCell: () => (
-        <Stack direction="row" spacing={1}>
+      flex: 1,
+      renderCell: (params) => (
+        <Box sx={{ display: "flex", gap: 1 }}>
           <Button
             variant="contained"
             size="small"
+            onClick={() => handleEdit(params.row._id)}
           >
             Edit
           </Button>
-
           <Button
-            variant="contained"
-            color="warning"
+            variant="outlined"
+            color="error"
             size="small"
+            onClick={() => handleDelete(params.row._id)}
           >
-            Disable
+            Delete
           </Button>
-        </Stack>
+        </Box>
       ),
     },
   ];
 
   return (
     <>
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ mb: 4 }}
-      >
-        <Typography
-          variant="h4"
-          fontWeight="bold"
-        >
-          Articles
+      <Stack direction="row" sx={{ mb: 5, justifyContent: "space-between" }}>
+        <Typography variant="h6" fontWeight="bold">
+          Articles Management
         </Typography>
-
         <Button
           variant="contained"
           startIcon={<AddCircleIcon />}
@@ -189,125 +181,85 @@ const DashArticleListPage = () => {
         </Button>
       </Stack>
 
-      <Stack
-        direction="row"
-        spacing={2}
-        sx={{ mb: 3 }}
-      >
-        <TextField
-          fullWidth
-          label="Search Articles"
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-        />
-
-        <TextField
-          select
-          label="Status Filter"
-          value={statusFilter}
-          onChange={(e) =>
-            setStatusFilter(e.target.value)
-          }
-          sx={{ width: 200 }}
-        >
-          <MenuItem value="All">
-            All Statuses
-          </MenuItem>
-
-          <MenuItem value="Active">
-            Active
-          </MenuItem>
-
-          <MenuItem value="Disabled">
-            Disabled
-          </MenuItem>
-        </TextField>
-      </Stack>
-
-      <Box sx={{ height: 500 }}>
-        <DataGrid
-          rows={filteredArticles}
-          columns={columns}
-          pageSizeOptions={[5, 10]}
-        />
-      </Box>
-
       <Modal open={open} onClose={handleClose}>
         <Box sx={modalStyle}>
-          <Typography
-            variant="h5"
-            fontWeight="bold"
-          >
-            Add Article
+          <Typography variant="h6" fontWeight="bold" mb={2}>
+            {isEditing ? "Edit Article" : "Add Article"}
           </Typography>
 
-          <Stack spacing={2} sx={{ mt: 3 }}>
-            <TextField
-              label="Slug"
-              value={newArticle.slug}
-              onChange={(e) =>
-                setNewArticle({
-                  ...newArticle,
-                  slug: e.target.value,
-                })
-              }
-            />
+          <Divider sx={{ mb: 2 }} />
 
+          <Stack spacing={2}>
             <TextField
               label="Title"
+              size="small"
+              fullWidth
               value={newArticle.title}
-              onChange={(e) =>
-                setNewArticle({
-                  ...newArticle,
-                  title: e.target.value,
-                })
-              }
+              onChange={(e) => setNewArticle({ ...newArticle, title: e.target.value })}
             />
-
+            <Stack direction="row" spacing={2}>
+              <TextField
+                label="Author"
+                size="small"
+                fullWidth
+                value={newArticle.author}
+                onChange={(e) => setNewArticle({ ...newArticle, author: e.target.value })}
+              />
+              <TextField
+                label="Category"
+                size="small"
+                fullWidth
+                value={newArticle.category}
+                onChange={(e) => setNewArticle({ ...newArticle, category: e.target.value })}
+              />
+            </Stack>
             <TextField
-              label="Paragraph Count"
-              value={newArticle.paragraphs}
-              onChange={(e) =>
-                setNewArticle({
-                  ...newArticle,
-                  paragraphs: e.target.value,
-                })
-              }
+              label="Image URL"
+              size="small"
+              fullWidth
+              value={newArticle.image}
+              onChange={(e) => setNewArticle({ ...newArticle, image: e.target.value })}
             />
-
             <TextField
+              label="Content"
+              size="small"
+              fullWidth
               multiline
               rows={4}
-              label="Preview"
-              value={newArticle.preview}
-              onChange={(e) =>
-                setNewArticle({
-                  ...newArticle,
-                  preview: e.target.value,
-                })
-              }
+              value={newArticle.content}
+              onChange={(e) => setNewArticle({ ...newArticle, content: e.target.value })}
             />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={newArticle.isPublished}
+                  onChange={(e) => setNewArticle({ ...newArticle, isPublished: e.target.checked })}
+                  color="primary"
+                />
+              }
+              label={`Status: ${newArticle.isPublished ? "Published" : "Draft"}`}
+            />
+          </Stack>
 
-            <Stack
-              direction="row"
-              spacing={2}
-            >
-              <Button onClick={handleClose}>
-                Cancel
-              </Button>
+          <Divider sx={{ mt: 2, mb: 2 }} />
 
-              <Button
-                variant="contained"
-                onClick={handleAddArticle}
-              >
-                Add
-              </Button>
-            </Stack>
+          <Stack direction="row" justifyContent="flex-end" spacing={1}>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button variant="contained" onClick={handleSaveArticle}>
+              Save Article
+            </Button>
           </Stack>
         </Box>
       </Modal>
+
+      <Box sx={{ height: 500 }}>
+        <DataGrid
+          rows={articles}
+          columns={columns}
+          getRowId={(row) => row._id}
+          loading={loading}
+        />
+      </Box>
     </>
   );
 };

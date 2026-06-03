@@ -65,10 +65,8 @@ const columns = [
     headerName: "Full Name",
     width: 180,
     sortable: false,
-    valueGetter: (_, params) => {
-      const row = params?.row || {};
-      return `${row.firstName || ""} ${row.lastName || ""}`;
-    },
+    renderCell: (params) =>
+      `${params.row.firstName || ""} ${params.row.lastName || ""}`,
   },
 ];
 
@@ -114,17 +112,9 @@ const ReportsPage = () => {
         <head>
           <title>Report</title>
           <style>
-            body {
-              font-family: Arial;
-              padding: 24px;
-              background: #ffffff;
-            }
+            body { font-family: Arial; padding: 24px; background: #ffffff; }
             h1 { margin-bottom: 6px; }
-            .meta {
-              color: gray;
-              font-size: 12px;
-              margin-bottom: 20px;
-            }
+            .meta { color: gray; font-size: 12px; margin-bottom: 20px; }
           </style>
         </head>
         <body>
@@ -140,17 +130,7 @@ const ReportsPage = () => {
   };
 
   return (
-    <Box
-      sx={{
-        width: "100%",
-        maxWidth: "1300px",
-        mx: "auto",
-        px: { xs: 2, sm: 3, md: 4 },
-        py: 4,
-        backgroundColor: "#f5f7fb",
-        minHeight: "100vh",
-      }}
-    >
+    <Box sx={{ width: "100%", py: 2 }}>
       {/* HEADER */}
       <Stack
         direction={{ xs: "column", lg: "row" }}
@@ -198,7 +178,6 @@ const ReportsPage = () => {
               onChange={(e) => setSearch(e.target.value)}
               sx={{ minWidth: 220 }}
             />
-
             <TextField
               select
               size="small"
@@ -212,7 +191,6 @@ const ReportsPage = () => {
               <MenuItem value="Manager">Manager</MenuItem>
               <MenuItem value="User">User</MenuItem>
             </TextField>
-
             <TextField
               select
               size="small"
@@ -225,7 +203,6 @@ const ReportsPage = () => {
               <MenuItem value="Male">Male</MenuItem>
               <MenuItem value="Female">Female</MenuItem>
             </TextField>
-
             <TextField
               select
               size="small"
@@ -250,7 +227,6 @@ const ReportsPage = () => {
             <Typography variant="h6" fontWeight={600} mb={2}>
               Monthly Output
             </Typography>
-
             <BarChart
               height={320}
               series={[
@@ -269,7 +245,6 @@ const ReportsPage = () => {
               <Typography variant="h6" fontWeight={600} mb={2}>
                 Category Share
               </Typography>
-
               <Box display="flex" justifyContent="center">
                 <PieChart
                   width={320}
@@ -294,7 +269,6 @@ const ReportsPage = () => {
               <Typography variant="h6" fontWeight={600} mb={2}>
                 Completion Rate
               </Typography>
-
               <Box display="flex" justifyContent="center" height={240}>
                 <Gauge width={220} height={220} value={78} />
               </Box>
@@ -308,7 +282,6 @@ const ReportsPage = () => {
             <Typography variant="h6" fontWeight={600} mb={2}>
               User Reports
             </Typography>
-
             <Box sx={{ height: 420 }}>
               <DataGrid
                 rows={filteredRows}
@@ -319,9 +292,7 @@ const ReportsPage = () => {
                 }}
                 checkboxSelection
                 disableRowSelectionOnClick
-                sx={{
-                  border: "none",
-                }}
+                sx={{ border: "none" }}
               />
             </Box>
           </CardContent>

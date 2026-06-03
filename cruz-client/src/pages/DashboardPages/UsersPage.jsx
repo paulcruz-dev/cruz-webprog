@@ -11,13 +11,12 @@ import {
   Select,
   MenuItem,
   Switch,
+  FormControlLabel,
+  Divider,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-// ⚠️ Make sure these are correctly imported from your service
 import { fetchUsers, createUser, updateUser } from "../../services/UserService";
 
 const modalStyle = {
@@ -25,9 +24,9 @@ const modalStyle = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 760,
+  width: 500,
   bgcolor: "background.paper",
-  border: "2px solid #000",
+  borderRadius: 2,
   boxShadow: 24,
   p: 4,
 };
@@ -133,7 +132,7 @@ const UsersPage = () => {
       field: "name",
       headerName: "Name",
       flex: 1,
-      valueGetter: (params) =>
+      renderCell: (params) =>
         `${params.row.firstName || ""} ${params.row.lastName || ""}`,
     },
     { field: "age", headerName: "Age", flex: 1 },
@@ -143,7 +142,6 @@ const UsersPage = () => {
     { field: "username", headerName: "Username", flex: 1 },
     { field: "contactNumber", headerName: "Contact #", flex: 1 },
     { field: "address", headerName: "Address", flex: 1 },
-
     {
       field: "actions",
       headerName: "Actions",
@@ -186,79 +184,135 @@ const UsersPage = () => {
 
       <Modal open={open} onClose={handleClose}>
         <Box sx={modalStyle}>
-          <Typography variant="h5">
+          {/* Modal Title */}
+          <Typography variant="h6" fontWeight="bold" mb={2}>
             {isEditing ? "Edit User" : "Add User"}
           </Typography>
 
-          <Stack spacing={2} sx={{ mt: 2 }}>
+          <Divider sx={{ mb: 2 }} />
+
+          <Stack direction="row" spacing={2} mb={2}>
             <TextField
               label="First Name"
+              size="small"
+              fullWidth
               value={newUser.firstName}
-              onChange={(e) =>
-                setNewUser({ ...newUser, firstName: e.target.value })
-              }
+              onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
             />
-
             <TextField
               label="Last Name"
+              size="small"
+              fullWidth
               value={newUser.lastName}
-              onChange={(e) =>
-                setNewUser({ ...newUser, lastName: e.target.value })
-              }
+              onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
             />
+          </Stack>
 
+          <Stack direction="row" spacing={2} mb={2}>
             <TextField
               label="Age"
+              size="small"
+              fullWidth
               value={newUser.age}
-              onChange={(e) =>
-                setNewUser({ ...newUser, age: e.target.value })
-              }
+              onChange={(e) => setNewUser({ ...newUser, age: e.target.value })}
             />
-
-            <FormControl>
+            <FormControl size="small" fullWidth>
               <InputLabel>Gender</InputLabel>
               <Select
                 value={newUser.gender}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, gender: e.target.value })
-                }
+                label="Gender"
+                onChange={(e) => setNewUser({ ...newUser, gender: e.target.value })}
               >
                 <MenuItem value="Male">Male</MenuItem>
                 <MenuItem value="Female">Female</MenuItem>
               </Select>
             </FormControl>
+          </Stack>
 
+          <Stack direction="row" spacing={2} mb={2}>
             <TextField
-              label="Email"
-              value={newUser.email}
-              onChange={(e) =>
-                setNewUser({ ...newUser, email: e.target.value })
-              }
+              label="Contact Number"
+              size="small"
+              fullWidth
+              value={newUser.contactNumber}
+              onChange={(e) => setNewUser({ ...newUser, contactNumber: e.target.value })}
             />
+            <TextField
+              label="Email Address"
+              size="small"
+              fullWidth
+              value={newUser.email}
+              onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+            />
+          </Stack>
 
+          {/* Row 4: Role + Username */}
+          <Stack direction="row" spacing={2} mb={2}>
+            <FormControl size="small" fullWidth>
+              <InputLabel>Role</InputLabel>
+              <Select
+                value={newUser.type}
+                label="Role"
+                onChange={(e) => setNewUser({ ...newUser, type: e.target.value })}
+              >
+                <MenuItem value="admin">Admin</MenuItem>
+                <MenuItem value="editor">Editor</MenuItem>
+                <MenuItem value="viewer">Viewer</MenuItem>
+              </Select>
+            </FormControl>
             <TextField
               label="Username"
+              size="small"
+              fullWidth
+              autoComplete="off"
               value={newUser.username}
-              onChange={(e) =>
-                setNewUser({ ...newUser, username: e.target.value })
-              }
+              onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
             />
+          </Stack>
 
-            <TextField
-              label="Password"
-              type="password"
-              value={newUser.password}
-              onChange={(e) =>
-                setNewUser({ ...newUser, password: e.target.value })
-              }
-            />
+          {/* Row 5: Password */}
+          <TextField
+            label="Password"
+            type="password"
+            size="small"
+            fullWidth
+            autoComplete="new-password"
+            value={newUser.password}
+            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+            sx={{ mb: 2 }}
+          />
 
-            <Stack direction="row" spacing={2}>
-              <Button onClick={handleClose}>Cancel</Button>
-              <Button variant="contained" onClick={handleSaveUser}>
-                {isEditing ? "Save" : "Add"}
-              </Button>
-            </Stack>
+          {/* Row 6: Address */}
+          <TextField
+            label="Address"
+            size="small"
+            fullWidth
+            value={newUser.address}
+            onChange={(e) => setNewUser({ ...newUser, address: e.target.value })}
+            sx={{ mb: 2 }}
+          />
+
+          {/* User Status Toggle */}
+          <FormControlLabel
+            control={
+              <Switch
+                checked={newUser.isActive}
+                onChange={(e) => setNewUser({ ...newUser, isActive: e.target.checked })}
+                color="primary"
+              />
+            }
+            label={`User status: ${newUser.isActive ? "Active" : "Inactive"}`}
+            sx={{ mb: 2 }}
+          />
+
+          <Divider sx={{ mb: 2 }} />
+
+          {/* Action Buttons */}
+          <Stack direction="row" justifyContent="flex-end" spacing={1}>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button variant="contained" onClick={handleSaveUser}>
+              {isEditing ? "Save User" : "Save User"}
+            </Button>
           </Stack>
         </Box>
       </Modal>
